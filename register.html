@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Akun Baru</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            width: 100%;
+            transition: transform 0.2s ease;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .alert {
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Daftar Akun Baru</h1>
+        
+        <div id="alertMessage" class="alert"></div>
+        
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="nama">Nama Lengkap</label>
+                <input type="text" id="nama" name="nama" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="tempat_lahir">Tempat Lahir</label>
+                <input type="text" id="tempat_lahir" name="tempat_lahir" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="tanggal_lahir">Tanggal Lahir</label>
+                <input type="date" id="tanggal_lahir" name="tanggal_lahir" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="asal_tinggal">Asal Tinggal</label>
+                <input type="text" id="asal_tinggal" name="asal_tinggal" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="no_hp">No. HP</label>
+                <input type="tel" id="no_hp" name="no_hp" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Kata Sandi</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm_password">Konfirmasi Kata Sandi</label>
+                <input type="password" id="confirm_password" name="confirm_password" required>
+            </div>
+            
+            <button type="submit" class="btn">Daftar Akun</button>
+        </form>
+        
+        <div class="login-link">
+            <p>Sudah punya akun? <a href="login.html">Login di sini</a></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            
+            // Validasi password
+            if (password !== confirmPassword) {
+                showAlert('Konfirmasi kata sandi tidak sesuai!', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showAlert('Kata sandi minimal 6 karakter!', 'error');
+                return;
+            }
+            
+            // Kirim data ke PHP
+            fetch('process_register.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    document.getElementById('registerForm').reset();
+                    
+                    // Redirect ke login setelah 2 detik
+                    if (data.redirect) {
+                        setTimeout(() => {
+                            window.location.href = 'login.html';
+                        }, 2000);
+                    }
+                } else {
+                    showAlert(data.message, 'error');
+                }
+            })
+            .catch(error => {
+                showAlert('Terjadi kesalahan!', 'error');
+                console.error('Error:', error);
+            });
+        });
+        
+        function showAlert(message, type) {
+            const alertDiv = document.getElementById('alertMessage');
+            alertDiv.textContent = message;
+            alertDiv.className = 'alert alert-' + type;
+            alertDiv.style.display = 'block';
+            
+            // Sembunyikan alert setelah 5 detik
+            setTimeout(() => {
+                alertDiv.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
